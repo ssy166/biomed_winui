@@ -1,0 +1,19 @@
+<Page
+    x:Class="biomed.Views.LoginPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <Grid>
+        <StackPanel Spacing="8" VerticalAlignment="Center" HorizontalAlignment="Center" Width="320">
+            <TextBlock Text="登录" FontSize="24" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,0,0,24"/>
+            <TextBox Header="用户名" Text="{x:Bind ViewModel.Username, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+            <PasswordBox Header="密码" Password="{x:Bind ViewModel.Password, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+            <ProgressRing IsActive="{x:Bind ViewModel.IsLoggingIn, Mode=OneWay}" Margin="0,16" />
+            <TextBlock Text="{x:Bind ViewModel.ErrorMessage, Mode=OneWay}" Foreground="Red" MinHeight="20" TextWrapping="Wrap"/>
+            <Button Content="登录" Command="{x:Bind ViewModel.LoginCommand}" HorizontalAlignment="Stretch" Margin="0,8,0,0" Style="{StaticResource AccentButtonStyle}"/>
+        </StackPanel>
+    </Grid>
+</Page> 

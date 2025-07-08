@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "biomed (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "biomed (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}
