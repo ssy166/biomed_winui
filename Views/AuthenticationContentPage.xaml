@@ -1,0 +1,49 @@
+<Page
+    x:Class="biomed.Views.AuthenticationContentPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Background="Transparent">
+
+    <StackPanel Spacing="16" MinWidth="320">
+        <TextBlock Text="登录" Style="{ThemeResource TitleTextBlockStyle}" Margin="0,0,0,12"/>
+
+        <Pivot>
+            <PivotItem Header="密码登录">
+                <StackPanel Spacing="12" Margin="0,12,0,0">
+                    <TextBox x:Name="UsernameTextBox" Header="账号"/>
+                    <PasswordBox x:Name="PasswordBox" Header="密码"/>
+                </StackPanel>
+            </PivotItem>
+            <PivotItem Header="扫码登录">
+                <StackPanel Spacing="12" Margin="0,12,0,0" HorizontalAlignment="Center">
+                    <Image Source="/Assets/StoreLogo.png" Height="150" Width="150" Margin="0,12,0,0"/>
+                    <TextBlock Text="请使用手机 App 扫码" HorizontalAlignment="Center"/>
+                </StackPanel>
+            </PivotItem>
+            <PivotItem Header="注册">
+                <StackPanel Spacing="12" Margin="0,12,0,0">
+                    <TextBox x:Name="RegisterUsernameTextBox" Header="用户名"/>
+                    <PasswordBox x:Name="RegisterPasswordBox" Header="密码"/>
+                    <PasswordBox x:Name="RegisterConfirmPasswordBox" Header="确认密码"/>
+                    <Button x:Name="RegisterButton" Content="注册" Style="{ThemeResource AccentButtonStyle}" HorizontalAlignment="Stretch" Click="OnRegisterClicked"/>
+                </StackPanel>
+            </PivotItem>
+        </Pivot>
+        
+        <TextBlock Text="登录代表你同意相关条款" Style="{ThemeResource CaptionTextBlockStyle}" Margin="0,12,0,0"/>
+
+        <InfoBar x:Name="InfoBar" IsOpen="False" IsClosable="True" Margin="0,8,0,0"/>
+
+        <Grid Margin="0,24,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Button x:Name="PrimaryButton" Content="登录" Style="{ThemeResource AccentButtonStyle}" HorizontalAlignment="Stretch"/>
+            <Button x:Name="CloseButton" Content="取消" Grid.Column="1" HorizontalAlignment="Stretch" Margin="8,0,0,0"/>
+        </Grid>
+    </StackPanel>
+</Page> 

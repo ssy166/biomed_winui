@@ -1,10 +1,14 @@
 using System.ComponentModel;
+using System.Threading.Tasks;
 using biomed.Models;
+using System;
 
 namespace biomed.Services
 {
     public class UserStore : IUserStore
     {
+        private readonly ApiClient _apiClient;
+
         private User _currentUser;
         public User CurrentUser
         {
@@ -21,16 +25,27 @@ namespace biomed.Services
 
         public bool IsLoggedIn => CurrentUser != null;
 
-        public void Login(User user, string token)
+        public UserStore(ApiClient apiClient)
         {
+            _apiClient = apiClient;
+        }
+
+        public async Task LoginAsync(LoginRequestDto loginRequest)
+        {
+            var user = await _apiClient.LoginAsync(loginRequest);
             CurrentUser = user;
-            AuthToken = token;
+            // The token is now set within the ApiClient's LoginAsync method
+        }
+
+        public async Task RegisterAsync(RegisterRequestDto registerRequest)
+        {
+            await _apiClient.RegisterAsync(registerRequest);
         }
 
         public void Logout()
         {
             CurrentUser = null;
-            AuthToken = null;
+            _apiClient.SetAuthToken(null); // Clear the token in ApiClient
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

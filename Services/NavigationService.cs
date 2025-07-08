@@ -3,7 +3,7 @@ using System;
 
 namespace biomed.Services
 {
-    public class NavigationService
+    public class NavigationService : INavigationService
     {
         public Frame AppFrame { get; set; }
 

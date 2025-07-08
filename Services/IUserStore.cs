@@ -1,4 +1,5 @@
 using System.ComponentModel;
+using System.Threading.Tasks;
 using biomed.Models;
 
 namespace biomed.Services
@@ -6,9 +7,9 @@ namespace biomed.Services
     public interface IUserStore : INotifyPropertyChanged
     {
         User CurrentUser { get; }
-        string AuthToken { get; }
         bool IsLoggedIn { get; }
-        void Login(User user, string token);
+        Task LoginAsync(LoginRequestDto loginRequest);
+        Task RegisterAsync(RegisterRequestDto registerRequest);
         void Logout();
     }
 } 

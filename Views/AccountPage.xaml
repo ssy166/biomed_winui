@@ -1,0 +1,45 @@
+<Page
+    x:Class="biomed.Views.AccountPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+        <StackPanel Spacing="16" Padding="40,32,40,32">
+            <TextBlock Text="帐户 > 帐户信息" Style="{ThemeResource TitleTextBlockStyle}"/>
+
+            <StackPanel Orientation="Horizontal" Spacing="16" Margin="0,24,0,0">
+                <PersonPicture ProfilePicture="{x:Bind ViewModel.UserStore.CurrentUser.AvatarUrl, Mode=OneWay, FallbackValue='ms-appx:///Assets/StoreLogo.png'}" 
+                               DisplayName="{x:Bind ViewModel.UserStore.CurrentUser.Username, Mode=OneWay}" Height="80" Width="80"/>
+                <StackPanel VerticalAlignment="Center">
+                    <TextBlock Text="{x:Bind ViewModel.UserStore.CurrentUser.Username, Mode=OneWay}" Style="{ThemeResource SubtitleTextBlockStyle}" FontWeight="Bold"/>
+                    <TextBlock Text="{x:Bind ViewModel.UserStore.CurrentUser.FullName, Mode=OneWay, FallbackValue='暂无全名'}" Style="{ThemeResource BodyTextBlockStyle}"/>
+                </StackPanel>
+            </StackPanel>
+
+            <TextBlock Text="帐户设置" Style="{ThemeResource SubtitleTextBlockStyle}" Margin="0,24,0,0"/>
+            <InfoBar
+                IsOpen="True"
+                Severity="Warning"
+                Title="这是一个示例警告"
+                Message="您可以在此放置需要用户注意的信息。"
+                IsClosable="True"/>
+
+            <TextBlock Text="修改密码" Style="{ThemeResource SubtitleTextBlockStyle}" Margin="0,24,0,0"/>
+            <StackPanel Spacing="12" MaxWidth="320">
+                <PasswordBox x:Name="OldPasswordBox" Header="当前密码"/>
+                <PasswordBox x:Name="NewPasswordBox" Header="新密码"/>
+                <PasswordBox x:Name="ConfirmNewPasswordBox" Header="确认新密码"/>
+                <Button Content="确认修改" Command="{x:Bind ViewModel.UpdatePasswordCommand}" 
+                        CommandParameter="{Binding ElementName=OldPasswordBox, Path=Password}"
+                        Margin="0,8,0,0"/> 
+                <!-- A more robust solution would pass all passwords via a custom parameter object -->
+            </StackPanel>
+
+            <Button Content="注销" Command="{x:Bind ViewModel.LogoutCommand}" Margin="0,48,0,0"/>
+        </StackPanel>
+    </ScrollViewer>
+</Page> 

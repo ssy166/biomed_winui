@@ -1,5 +1,5 @@
-﻿using Microsoft.UI.Xaml;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.UI.Xaml;
 using biomed.Services;
 using biomed.ViewModels;
 using biomed.Views;
@@ -13,7 +13,15 @@ namespace biomed
     public partial class App : Application
     {
         public static IServiceProvider Services { get; private set; }
-        private Window m_window;
+
+        public static T GetService<T>() where T : class
+        {
+            if (Services.GetService(typeof(T)) is not T service)
+            {
+                throw new ArgumentException($"{typeof(T)} needs to be registered in ConfigureServices within App.xaml.cs.");
+            }
+            return service;
+        }
 
         /// <summary>
         /// Initializes the singleton application object.  This is the first line of authored code
@@ -31,43 +39,31 @@ namespace biomed
         /// <param name="args">Details about the launch request and process.</param>
         protected override void OnLaunched(LaunchActivatedEventArgs args)
         {
-            m_window = new MainWindow();
-
-            var rootFrame = m_window.Content as Microsoft.UI.Xaml.Controls.Frame;
-            if (rootFrame == null)
-            {
-                rootFrame = new Microsoft.UI.Xaml.Controls.Frame();
-                m_window.Content = rootFrame;
-            }
-
-            rootFrame.Navigate(typeof(ShellPage));
-
-            m_window.Activate();
+            var window = GetService<MainWindow>();
+            window.Activate();
         }
 
         private static IServiceProvider ConfigureServices()
         {
             var services = new ServiceCollection();
 
-            // Core Services (Singletons)
+            // Services
             services.AddSingleton<ApiClient>();
             services.AddSingleton<IUserStore, UserStore>();
-            services.AddSingleton<NavigationService>();
+            services.AddSingleton<INavigationService, NavigationService>();
 
-            // ViewModels (Transient)
-            services.AddTransient<ShellViewModel>();
-            services.AddTransient<LoginViewModel>();
+            // ViewModels
             services.AddTransient<HomeViewModel>();
             services.AddTransient<ResearchViewModel>();
+            services.AddTransient<AccountViewModel>();
 
-            // Views / Pages (Transient)
-            services.AddTransient<ShellPage>();
-            services.AddTransient<LoginPage>();
+            // Views/Pages
             services.AddTransient<HomePage>();
-            services.AddTransient<FormulaPage>();
             services.AddTransient<ResearchPage>();
-            
-            // Register MainWindow to be accessible from DI
+            services.AddTransient<AccountPage>();
+            services.AddTransient<AuthenticationContentPage>();
+
+            // Main Window
             services.AddSingleton<MainWindow>();
 
             return services.BuildServiceProvider();

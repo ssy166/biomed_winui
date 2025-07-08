@@ -44,16 +44,24 @@ namespace biomed.ViewModels
             ErrorMessage = string.Empty;
             try
             {
-                var response = await _apiClient.PostAsync<object, LoginResponse>("/auth/login", new { Username, Password });
-                if (response != null && !string.IsNullOrEmpty(response.Token))
+                var loginRequest = new LoginRequestDto
                 {
-                    _apiClient.SetAuthToken(response.Token);
-                    _userStore.Login(response.UserInfo, response.Token);
+                    Username = this.Username,
+                    Password = this.Password
+                };
+
+                await _userStore.LoginAsync(loginRequest);
+
+                // After successful login, UserStore.IsLoggedIn will be true.
+                // The UI should react to changes in UserStore.
+                // We can navigate away if login is successful.
+                if (_userStore.IsLoggedIn)
+                {
                     _navigationService.NavigateTo(typeof(HomePage));
                 }
                 else
                 {
-                    ErrorMessage = "登录失败: 无效的响应。";
+                    ErrorMessage = "登录失败: 用户名或密码无效。";
                 }
             }
             catch (Exception ex)
