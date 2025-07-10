@@ -13,6 +13,8 @@ namespace biomed
     public partial class App : Application
     {
         public static IServiceProvider Services { get; private set; }
+        public static Window MainWindow { get; private set; }
+        public static XamlRoot MainRoot => MainWindow.Content.XamlRoot;
 
         public static T GetService<T>() where T : class
         {
@@ -37,10 +39,12 @@ namespace biomed
         /// Invoked when the application is launched.
         /// </summary>
         /// <param name="args">Details about the launch request and process.</param>
-        protected override void OnLaunched(LaunchActivatedEventArgs args)
+        protected override void OnLaunched(Microsoft.UI.Xaml.LaunchActivatedEventArgs args)
         {
-            var window = GetService<MainWindow>();
-            window.Activate();
+            base.OnLaunched(args);
+            
+            MainWindow = Services.GetRequiredService<MainWindow>();
+            MainWindow.Activate();
         }
 
         private static IServiceProvider ConfigureServices()
@@ -53,15 +57,21 @@ namespace biomed
             services.AddSingleton<INavigationService, NavigationService>();
 
             // ViewModels
+            services.AddSingleton<ShellViewModel>();
             services.AddTransient<HomeViewModel>();
             services.AddTransient<ResearchViewModel>();
+            services.AddTransient<ResearchPlatformViewModel>();
             services.AddTransient<AccountViewModel>();
+            services.AddTransient<EducationViewModel>();
+            services.AddTransient<LoginViewModel>();
 
             // Views/Pages
             services.AddTransient<HomePage>();
             services.AddTransient<ResearchPage>();
+            services.AddTransient<ResearchPlatformPage>();
             services.AddTransient<AccountPage>();
             services.AddTransient<AuthenticationContentPage>();
+            services.AddTransient<ShellPage>();
 
             // Main Window
             services.AddSingleton<MainWindow>();

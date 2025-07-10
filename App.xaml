@@ -12,7 +12,9 @@
                 <!-- Other merged dictionaries here -->
             </ResourceDictionary.MergedDictionaries>
             <!-- Other app resources here -->
-            <converters:StringToVisibilityConverter x:Key="StringToVisibilityConverter"/>
+            <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
+            <converters:StringUrlToImageSourceConverter x:Key="StringUrlToImageSourceConverter" />
+            <converters:ObjectToVisibilityConverter x:Key="ObjectToVisibilityConverter" />
         </ResourceDictionary>
     </Application.Resources>
 </Application>

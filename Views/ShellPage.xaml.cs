@@ -15,21 +15,23 @@ namespace biomed.Views
     public sealed partial class ShellPage : Page
     {
         public ShellViewModel ViewModel { get; }
-        private readonly NavigationService _navigationService;
+        private readonly INavigationService _navigationService;
 
         private readonly Dictionary<string, Type> _pages = new()
         {
             { "home", typeof(HomePage) },
             { "formula", typeof(FormulaPage) },
-            { "research", typeof(ResearchPage) },
-            { "login", typeof(LoginPage) }
+            { "research_platform", typeof(ResearchPlatformPage) },
+            { "education", typeof(EducationPage) },
+            { "login", typeof(LoginPage) },
+            { "account", typeof(AccountPage) }
         };
 
         public ShellPage()
         {
             this.InitializeComponent();
             ViewModel = App.Services.GetRequiredService<ShellViewModel>();
-            _navigationService = App.Services.GetRequiredService<NavigationService>();
+            _navigationService = App.Services.GetRequiredService<INavigationService>();
             
             this.Loaded += OnShellLoaded;
             ContentFrame.Navigated += OnFrameNavigated;
@@ -43,17 +45,22 @@ namespace biomed.Views
             var window = App.Services.GetRequiredService<MainWindow>();
             window.SetTitleBar(AppTitleBar);
             
-            _navigationService.AppFrame = this.ContentFrame;
+            if (_navigationService is NavigationService concreteNavigationService)
+            {
+                concreteNavigationService.AppFrame = this.ContentFrame;
+            }
 
-            ViewModel.UserStore.PropertyChanged += OnLoginStateChanged;
+            ViewModel.PropertyChanged += OnViewModelPropertyChanged;
             
             UpdateLoginLogoutButton();
             _navigationService.NavigateTo(_pages["home"]);
         }
         
-        private void OnLoginStateChanged(object sender, PropertyChangedEventArgs e)
+        private void OnViewModelPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            if (e.PropertyName == nameof(ViewModel.UserStore.IsLoggedIn))
+            if (e.PropertyName == nameof(ViewModel.User) || 
+                e.PropertyName == nameof(ViewModel.IsUserLoggedIn) || 
+                e.PropertyName == nameof(ViewModel.UserDisplayName))
             {
                 DispatcherQueue.TryEnqueue(() =>
                 {
@@ -64,17 +71,23 @@ namespace biomed.Views
 
         private void UpdateLoginLogoutButton()
         {
-            if (ViewModel.UserStore.IsLoggedIn)
+            if (ViewModel.User != null)
             {
-                LoginLogoutItem.Content = $"注销 ({ViewModel.UserStore.CurrentUser.Username})";
+                // 简化显示文本，避免文本过长
+                LoginLogoutItem.Content = "注销";
                 LoginLogoutItem.Icon = new FontIcon { Glyph = "\uE7E8" };
                 LoginLogoutItem.Tag = "logout_action";
+                
+                // 设置工具提示显示完整信息
+                var username = ViewModel.User.Username;
+                ToolTipService.SetToolTip(LoginLogoutItem, $"注销 {username}");
             }
             else
             {
                 LoginLogoutItem.Content = "登录";
                 LoginLogoutItem.Icon = new FontIcon { Glyph = "\uE8D4" };
                 LoginLogoutItem.Tag = "login";
+                ToolTipService.SetToolTip(LoginLogoutItem, "登录到您的账户");
             }
         }
 
@@ -95,19 +108,40 @@ namespace biomed.Views
             }
         }
 
-        private void LoginLogoutItem_Tapped(object sender, TappedRoutedEventArgs e)
+        private async void LoginLogoutItem_Tapped(object sender, TappedRoutedEventArgs e)
         {
             if (sender is NavigationViewItem item && item.Tag is string tag)
             {
                 if (tag == "logout_action")
                 {
-                    ViewModel.UserStore.Logout();
+                    // Directly call the UserStore's Logout method
+                    var userStore = App.Services.GetRequiredService<IUserStore>();
+                    userStore.Logout();
                     _navigationService.NavigateTo(_pages["home"]);
                 }
                 else if (tag == "login")
                 {
-                    _navigationService.NavigateTo(_pages["login"]);
+                    var contentPage = App.GetService<AuthenticationContentPage>();
+                    var dialog = new AuthenticationDialog(contentPage)
+                    {
+                        XamlRoot = this.Content.XamlRoot,
+                    };
+
+                    contentPage.RequestClose += (s, success) => 
+                    {
+                        dialog.Hide();
+                    };
+
+                    await dialog.ShowAsync();
                 }
+            }
+        }
+
+        private void UserAvatar_Tapped(object sender, TappedRoutedEventArgs e)
+        {
+            if (ViewModel.User != null)
+            {
+                _navigationService.NavigateTo(typeof(AccountPage));
             }
         }
         

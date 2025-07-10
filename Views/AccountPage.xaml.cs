@@ -9,9 +9,8 @@ namespace biomed.Views
 
         public AccountPage()
         {
-            this.InitializeComponent();
-            // ViewModel will be injected by the NavigationService or DI framework
             ViewModel = App.GetService<AccountViewModel>();
+            this.InitializeComponent();
         }
     }
 } 

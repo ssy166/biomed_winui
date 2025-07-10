@@ -8,38 +8,6 @@
     mc:Ignorable="d">
 
     <Grid>
-        <NavigationView x:Name="NavView"
-                        PaneDisplayMode="LeftCompact"
-                        IsBackButtonVisible="Collapsed"
-                        IsBackEnabled="False"
-                        IsSettingsVisible="True"
-                        ItemInvoked="NavView_ItemInvoked">
-            
-            <NavigationView.MenuItems>
-                <NavigationViewItem Icon="Home" Content="主页" Tag="biomed.Views.HomePage"/>
-                <NavigationViewItem Icon="Video" Content="精选" Tag="biomed.Views.FeaturedPage"/>
-                <NavigationViewItem Icon="Send" Content="动态" Tag="biomed.Views.UpdatesPage"/>
-            </NavigationView.MenuItems>
-
-            <NavigationView.PaneFooter>
-                <StackPanel>
-                    <NavigationViewItemSeparator/>
-                    <!-- The User avatar button, now a proper Button -->
-                    <Button x:Name="UserAvatarButton" Click="UserAvatarButton_Click" ToolTipService.ToolTip="我的账户"
-                            HorizontalAlignment="Center" Padding="0" BorderThickness="0" Background="Transparent">
-                        <PersonPicture
-                            Height="28"
-                            Width="28"
-                            ProfilePicture="{x:Bind UserStore.CurrentUser.AvatarUrl, Mode=OneWay, FallbackValue='ms-appx:///Assets/StoreLogo.png'}"
-                            DisplayName="{x:Bind UserStore.CurrentUser.Username, Mode=OneWay, FallbackValue='游客'}" />
-                    </Button>
-                    
-                    <NavigationViewItem Icon="Upload" ToolTipService.ToolTip="上传" Tag="biomed.Views.UploadPage"/>
-                    <NavigationViewItem Icon="Message" ToolTipService.ToolTip="消息" Tag="biomed.Views.MessagesPage"/>
-                </StackPanel>
-            </NavigationView.PaneFooter>
-
-            <Frame x:Name="ContentFrame"/>
-        </NavigationView>
+        <Frame x:Name="RootFrame"/>
     </Grid>
 </Window>

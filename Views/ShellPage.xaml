@@ -4,8 +4,13 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:converters="using:biomed.Converters"
     mc:Ignorable="d">
 
+    <Page.Resources>
+        <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
+    </Page.Resources>
+    
     <Grid>
         <NavigationView x:Name="NavView"
                         PaneDisplayMode="Left"
@@ -34,18 +39,42 @@
                         <FontIcon Glyph="&#xE9D8;"/>
                     </NavigationViewItem.Icon>
                 </NavigationViewItem>
-                <NavigationViewItem Content="论文检索" Tag="research">
+                <NavigationViewItem Content="研究平台" Tag="research_platform">
                     <NavigationViewItem.Icon>
-                        <FontIcon Glyph="&#xE8A4;"/>
+                        <FontIcon Glyph="&#xE7F8;"/>
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
+                <NavigationViewItem Content="教学平台" Tag="education">
+                    <NavigationViewItem.Icon>
+                        <FontIcon Glyph="&#xE7BE;"/>
                     </NavigationViewItem.Icon>
                 </NavigationViewItem>
             </NavigationView.MenuItems>
             
             <NavigationView.PaneFooter>
-                <NavigationViewItem x:Name="LoginLogoutItem" />
+                <StackPanel>
+                    <PersonPicture
+                        x:Name="UserAvatar"
+                        Tapped="UserAvatar_Tapped"
+                        ToolTipService.ToolTip="我的账户"
+                        Margin="0,0,0,8"
+                        HorizontalAlignment="Center"
+                        Height="32"
+                        Width="32"
+                        ProfilePicture="{x:Bind ViewModel.UserProfileImage, Mode=OneWay}"
+                        DisplayName="{x:Bind ViewModel.UserDisplayName, Mode=OneWay}"
+                        Visibility="{x:Bind ViewModel.IsUserLoggedIn, Converter={StaticResource BoolToVisibilityConverter}, Mode=OneWay}"/>
+                    
+                    <NavigationViewItemSeparator/>
+                    <NavigationViewItem x:Name="LoginLogoutItem" Content="登录" Tag="login">
+                        <NavigationViewItem.Icon>
+                            <FontIcon Glyph="&#xE8D4;"/>
+                        </NavigationViewItem.Icon>
+                    </NavigationViewItem>
+                </StackPanel>
             </NavigationView.PaneFooter>
 
-            <Frame x:Name="ContentFrame" />
+            <Frame x:Name="ContentFrame"/>
         </NavigationView>
     </Grid>
 </Page> 

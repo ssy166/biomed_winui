@@ -70,7 +70,7 @@ namespace biomed.Views
                 var registerRequest = new RegisterRequestDto
                 {
                     Username = regUsername,
-                    Password = regPassword
+                    PasswordHash = regPassword
                 };
                 await _userStore.RegisterAsync(registerRequest);
 

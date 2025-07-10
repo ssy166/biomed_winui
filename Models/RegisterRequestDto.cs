@@ -8,6 +8,6 @@ namespace biomed.Models
         public string Username { get; set; }
 
         [JsonPropertyName("passwordHash")]
-        public string Password { get; set; }
+        public string PasswordHash { get; set; }
     }
 } 

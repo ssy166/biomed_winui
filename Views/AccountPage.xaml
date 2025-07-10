@@ -12,7 +12,7 @@
             <TextBlock Text="帐户 > 帐户信息" Style="{ThemeResource TitleTextBlockStyle}"/>
 
             <StackPanel Orientation="Horizontal" Spacing="16" Margin="0,24,0,0">
-                <PersonPicture ProfilePicture="{x:Bind ViewModel.UserStore.CurrentUser.AvatarUrl, Mode=OneWay, FallbackValue='ms-appx:///Assets/StoreLogo.png'}" 
+                <PersonPicture ProfilePicture="{x:Bind ViewModel.UserStore.CurrentUser.ProfileImage, Mode=OneWay}" 
                                DisplayName="{x:Bind ViewModel.UserStore.CurrentUser.Username, Mode=OneWay}" Height="80" Width="80"/>
                 <StackPanel VerticalAlignment="Center">
                     <TextBlock Text="{x:Bind ViewModel.UserStore.CurrentUser.Username, Mode=OneWay}" Style="{ThemeResource SubtitleTextBlockStyle}" FontWeight="Bold"/>
