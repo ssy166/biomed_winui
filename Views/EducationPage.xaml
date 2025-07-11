@@ -36,51 +36,108 @@
             </Grid>
         </Border>
 
-        <Grid Grid.Column="1">
+        <Grid Grid.Column="1"
+              x:Name="ContentGrid">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
 
-            <Border BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1">
+            <!-- 搜索栏 -->
+            <Border Grid.Row="0" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1">
                 <StackPanel Orientation="Horizontal" Spacing="12" Padding="24,16,24,16">
-                    <TextBox PlaceholderText="搜索课程标题..." MinWidth="300"/>
+                    <TextBox PlaceholderText="搜索内容..." MinWidth="300"/>
                     <Button Content="搜索"/>
                 </StackPanel>
             </Border>
 
-            <ScrollViewer Grid.Row="1" Padding="12">
-                <GridView
-                    ItemsSource="{x:Bind ViewModel.Resources, Mode=OneWay}"
-                    SelectionMode="None"
-                    IsItemClickEnabled="True"
-                    ItemClick="ResourcesGridView_ItemClick">
-                    <GridView.ItemTemplate>
-                        <DataTemplate x:DataType="models:EduResource">
-                            <Grid CornerRadius="4" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1" Width="280" Height="250">
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="140"/>
-                                    <RowDefinition Height="*"/>
-                                </Grid.RowDefinitions>
-                                <Image Source="{x:Bind CoverImageUrl, Converter={StaticResource StringUrlToImageSourceConverter}}" Stretch="UniformToFill" />
-                                <StackPanel Grid.Row="1" Padding="12" Spacing="4">
-                                    <TextBlock Text="{x:Bind Title}" Style="{ThemeResource BaseTextBlockStyle}" FontWeight="SemiBold" MaxLines="2" TextTrimming="CharacterEllipsis"/>
-                                    <TextBlock Text="{x:Bind AuthorName}" Style="{ThemeResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
-                                    <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,8,0,0">
-                                        <TextBlock Text="{x:Bind CategoryName}" Style="{ThemeResource CaptionTextBlockStyle}"/>
-                                        <TextBlock Text="{x:Bind Status}" Style="{ThemeResource CaptionTextBlockStyle}"/>
-                                    </StackPanel>
-                                </StackPanel>
-                            </Grid>
-                        </DataTemplate>
-                    </GridView.ItemTemplate>
-                    <GridView.ItemsPanel>
-                        <ItemsPanelTemplate>
-                            <ItemsWrapGrid Orientation="Horizontal" HorizontalAlignment="Left"/>
-                        </ItemsPanelTemplate>
-                    </GridView.ItemsPanel>
-                </GridView>
-            </ScrollViewer>
+            <!-- 内容区域 -->
+            <Pivot Grid.Row="1" x:Name="ContentPivot" Margin="12,0,12,12">
+                <!-- 图文资源 -->
+                <PivotItem Header="图文课程">
+                    <ScrollViewer Padding="12">
+                        <GridView
+                            ItemsSource="{x:Bind ViewModel.Resources, Mode=OneWay}"
+                            SelectionMode="None"
+                            IsItemClickEnabled="True"
+                            ItemClick="ResourcesGridView_ItemClick">
+                            <GridView.ItemTemplate>
+                                <DataTemplate x:DataType="models:EduResource">
+                                    <Grid CornerRadius="4" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1" Width="280" Height="250">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="140"/>
+                                            <RowDefinition Height="*"/>
+                                        </Grid.RowDefinitions>
+                                        <Image Source="{x:Bind CoverImageUrl, Converter={StaticResource StringUrlToImageSourceConverter}}" Stretch="UniformToFill" />
+                                        <StackPanel Grid.Row="1" Padding="12" Spacing="4">
+                                            <TextBlock Text="{x:Bind Title}" Style="{ThemeResource BaseTextBlockStyle}" FontWeight="SemiBold" MaxLines="2" TextTrimming="CharacterEllipsis"/>
+                                            <TextBlock Text="{x:Bind AuthorName}" Style="{ThemeResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                                            <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,8,0,0">
+                                                <TextBlock Text="{x:Bind CategoryName}" Style="{ThemeResource CaptionTextBlockStyle}"/>
+                                                <TextBlock Text="{x:Bind Status}" Style="{ThemeResource CaptionTextBlockStyle}"/>
+                                            </StackPanel>
+                                        </StackPanel>
+                                    </Grid>
+                                </DataTemplate>
+                            </GridView.ItemTemplate>
+                            <GridView.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <ItemsWrapGrid Orientation="Horizontal" HorizontalAlignment="Left"/>
+                                </ItemsPanelTemplate>
+                            </GridView.ItemsPanel>
+                        </GridView>
+                    </ScrollViewer>
+                </PivotItem>
+
+                <!-- 视频资源 -->
+                <PivotItem Header="视频课程">
+                    <ScrollViewer Padding="12">
+                        <GridView
+                            ItemsSource="{x:Bind ViewModel.Videos, Mode=OneWay}"
+                            SelectionMode="None"
+                            IsItemClickEnabled="True"
+                            ItemClick="VideosGridView_ItemClick">
+                            <GridView.ItemTemplate>
+                                <DataTemplate x:DataType="models:VideoDto">
+                                    <Grid CornerRadius="4" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1" Width="280" Height="250">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="140"/>
+                                            <RowDefinition Height="*"/>
+                                        </Grid.RowDefinitions>
+                                        
+                                        <!-- 视频封面 -->
+                                        <Grid>
+                                            <Image Source="{x:Bind CoverUrl, Converter={StaticResource StringUrlToImageSourceConverter}}" Stretch="UniformToFill" />
+                                            <!-- 播放按钮覆盖层 -->
+                                            <Border Background="#80000000" CornerRadius="4,4,0,0">
+                                                <FontIcon Glyph="&#xE768;" FontSize="32" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                            </Border>
+                                            <!-- 时长显示 -->
+                                            <Border Background="#CC000000" CornerRadius="4" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="8">
+                                                <TextBlock Text="{x:Bind FormattedDuration}" Foreground="White" Padding="6,2" FontSize="12"/>
+                                            </Border>
+                                        </Grid>
+
+                                        <StackPanel Grid.Row="1" Padding="12" Spacing="4">
+                                            <TextBlock Text="{x:Bind Title}" Style="{ThemeResource BaseTextBlockStyle}" FontWeight="SemiBold" MaxLines="2" TextTrimming="CharacterEllipsis"/>
+                                            <TextBlock Text="{x:Bind UploaderName}" Style="{ThemeResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                                            <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,8,0,0">
+                                                <TextBlock Text="视频课程" Style="{ThemeResource CaptionTextBlockStyle}"/>
+                                                <TextBlock Text="{x:Bind Status}" Style="{ThemeResource CaptionTextBlockStyle}"/>
+                                            </StackPanel>
+                                        </StackPanel>
+                                    </Grid>
+                                </DataTemplate>
+                            </GridView.ItemTemplate>
+                            <GridView.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <ItemsWrapGrid Orientation="Horizontal" HorizontalAlignment="Left"/>
+                                </ItemsPanelTemplate>
+                            </GridView.ItemsPanel>
+                        </GridView>
+                    </ScrollViewer>
+                </PivotItem>
+            </Pivot>
         </Grid>
     </Grid>
 </Page> 

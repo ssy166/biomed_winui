@@ -25,6 +25,7 @@ namespace biomed.ViewModels
             _apiClient = App.GetService<ApiClient>();
             Categories = new ObservableCollection<EduCategory>();
             Resources = new ObservableCollection<EduResource>();
+            Videos = new ObservableCollection<VideoDto>();
         }
 
         [ObservableProperty]
@@ -32,6 +33,9 @@ namespace biomed.ViewModels
 
         [ObservableProperty]
         private ObservableCollection<EduResource> _resources;
+
+        [ObservableProperty]
+        private ObservableCollection<VideoDto> _videos;
 
         [ObservableProperty]
         [NotifyPropertyChangedFor(nameof(IsError))]
@@ -44,9 +48,10 @@ namespace biomed.ViewModels
         
         public async Task LoadInitialDataAsync()
         {
-            // Sequentially load categories, then all resources.
+            // Sequentially load categories, then all resources and videos.
             await LoadCategoriesAsync();
             await LoadResourcesAsync();
+            await LoadVideosAsync();
         }
 
         private async Task LoadCategoriesAsync()
@@ -98,6 +103,32 @@ namespace biomed.ViewModels
             }
         }
 
+        private async Task LoadVideosAsync()
+        {
+            IsBusy = true;
+            ErrorMessage = null;
+            try
+            {
+                var pagedResult = await _apiClient.GetVideosAsync(status: "published");
+                Videos.Clear();
+                if (pagedResult?.Content != null)
+                {
+                    foreach (var video in pagedResult.Content)
+                    {
+                        Videos.Add(video);
+                    }
+                }
+            }
+            catch (System.Exception ex)
+            {
+                ErrorMessage = $"加载视频失败: {ex.Message}";
+            }
+            finally
+            {
+                IsBusy = false;
+            }
+        }
+
         [RelayCommand]
         private async Task ShowResourceDetails(EduResource resource)
         {
@@ -136,6 +167,23 @@ namespace biomed.ViewModels
             finally
             {
                 IsBusy = false;
+            }
+        }
+
+        [RelayCommand]
+        private async Task PlayVideo(VideoDto video)
+        {
+            if (video == null) return;
+
+            try
+            {
+                // 导航到视频播放页面
+                var navigationService = App.GetService<INavigationService>();
+                navigationService.Navigate(typeof(VideoPlayerPage), video);
+            }
+            catch (System.Exception ex)
+            {
+                ErrorMessage = $"播放视频失败: {ex.Message}";
             }
         }
     }

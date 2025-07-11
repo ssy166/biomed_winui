@@ -668,6 +668,24 @@ namespace biomed.Services
             return await GetAsync<EduResourceDetail>(endpoint);
         }
 
+        // 视频相关方法
+        public async Task<VideoPagedResult> GetVideosAsync(int pageNum = 1, int pageSize = 10, string status = null)
+        {
+            var queryParams = new List<string> { $"pageNum={pageNum}", $"pageSize={pageSize}" };
+            if (!string.IsNullOrEmpty(status))
+            {
+                queryParams.Add($"status={status}");
+            }
+            var endpoint = $"/api/videos/page?{string.Join("&", queryParams)}";
+            return await GetAsync<VideoPagedResult>(endpoint);
+        }
+
+        public async Task<VideoDto> GetVideoDetailAsync(long videoId)
+        {
+            var endpoint = $"/api/videos/{videoId}";
+            return await GetAsync<VideoDto>(endpoint);
+        }
+
         #endregion
 
         // 获取所有任务 - 合并教师和学生的任务

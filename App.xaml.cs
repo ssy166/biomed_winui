@@ -72,6 +72,7 @@ namespace biomed
             services.AddTransient<AccountPage>();
             services.AddTransient<AuthenticationContentPage>();
             services.AddTransient<ShellPage>();
+            services.AddTransient<VideoPlayerPage>();
 
             // Main Window
             services.AddSingleton<MainWindow>();

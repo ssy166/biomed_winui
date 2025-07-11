@@ -37,5 +37,13 @@ namespace biomed.Views
                 ViewModel.ShowResourceDetailsCommand.Execute(clickedResource);
             }
         }
+
+        private void VideosGridView_ItemClick(object sender, ItemClickEventArgs e)
+        {
+            if (e.ClickedItem is VideoDto clickedVideo)
+            {
+                ViewModel.PlayVideoCommand.Execute(clickedVideo);
+            }
+        }
     }
 } 
