@@ -61,15 +61,15 @@ namespace biomed.Services
                         try 
                         {
                             user.ProfileImage = new BitmapImage(imageUri);
-                        }
-                        catch (Exception)
-                        {
-                            user.ProfileImage = new BitmapImage(new Uri("ms-appx:///Assets/StoreLogo.png"));
-                        }
+                                            }
+                    catch (Exception)
+                    {
+                        user.ProfileImage = new BitmapImage(new Uri("ms-appx:///Assets/Square44x44Logo.scale-200.png"));
+                    }
                     }
                     else
                     {
-                        user.ProfileImage = new BitmapImage(new Uri("ms-appx:///Assets/StoreLogo.png"));
+                        user.ProfileImage = new BitmapImage(new Uri("ms-appx:///Assets/Square44x44Logo.scale-200.png"));
                     }
 
                     SetCurrentUser(user, user?.Token, user?.CsrfToken);

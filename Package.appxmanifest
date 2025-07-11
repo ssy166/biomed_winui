@@ -15,7 +15,7 @@
   <mp:PhoneIdentity PhoneProductId="e7d45321-04da-4350-b4d7-bf154854f5f2" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
 
   <Properties>
-    <DisplayName>中医药信息平台</DisplayName>
+    <DisplayName>biomed</DisplayName>
     <PublisherDisplayName>lenovo</PublisherDisplayName>
     <Logo>Assets\StoreLogo.png</Logo>
   </Properties>
