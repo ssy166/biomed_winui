@@ -34,7 +34,7 @@ namespace biomed.Views
         {
             if (e.ClickedItem is EduResource clickedResource)
             {
-                ViewModel.ShowResourceDetailsCommand.Execute(clickedResource);
+                ViewModel.ShowArticleDetailCommand.Execute(clickedResource);
             }
         }
 

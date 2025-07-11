@@ -15,6 +15,15 @@ namespace biomed.Models
         [JsonPropertyName("content")]
         public string Content { get; set; }
 
+        [JsonPropertyName("categoryId")]
+        public long CategoryId { get; set; }
+
+        [JsonPropertyName("categoryName")]
+        public string CategoryName { get; set; }
+
+        [JsonPropertyName("authorId")]
+        public long AuthorId { get; set; }
+
         [JsonPropertyName("authorName")]
         public string AuthorName { get; set; }
 

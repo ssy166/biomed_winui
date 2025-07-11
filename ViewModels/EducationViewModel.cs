@@ -186,5 +186,22 @@ namespace biomed.ViewModels
                 ErrorMessage = $"播放视频失败: {ex.Message}";
             }
         }
+
+        [RelayCommand]
+        private async Task ShowArticleDetail(EduResource resource)
+        {
+            if (resource == null) return;
+
+            try
+            {
+                // 导航到图文详情页面
+                var navigationService = App.GetService<INavigationService>();
+                navigationService.Navigate(typeof(ArticleDetailPage), resource);
+            }
+            catch (System.Exception ex)
+            {
+                ErrorMessage = $"查看图文详情失败: {ex.Message}";
+            }
+        }
     }
 } 
