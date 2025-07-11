@@ -106,6 +106,14 @@ namespace biomed.Services
             CurrentUser = user;
             AuthToken = authToken;
             CsrfToken = csrfToken;
+            
+            // 设置ApiClient的认证信息
+            _apiClient.SetAuthToken(authToken);
+            // 只有在有有效CSRF token时才设置，避免清除现有的token
+            if (!string.IsNullOrEmpty(csrfToken))
+            {
+                _apiClient.SetCsrfToken(csrfToken);
+            }
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

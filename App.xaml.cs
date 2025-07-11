@@ -63,6 +63,7 @@ namespace biomed
             services.AddTransient<ResearchPlatformViewModel>();
             services.AddTransient<AccountViewModel>();
             services.AddTransient<EducationViewModel>();
+            services.AddTransient<FormulaViewModel>();
             services.AddTransient<LoginViewModel>();
 
             // Views/Pages

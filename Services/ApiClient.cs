@@ -309,6 +309,13 @@ namespace biomed.Services
                             SetAuthToken(tokenData.Token);
                             System.Diagnostics.Debug.WriteLine($"✅ 登录成功，获得Token: {tokenData.Token.Substring(0, 10)}...");
 
+                            // 设置CSRF token（如果登录接口返回了）
+                            if (!string.IsNullOrEmpty(tokenData.CsrfToken))
+                            {
+                                SetCsrfToken(tokenData.CsrfToken);
+                                System.Diagnostics.Debug.WriteLine($"✅ 设置CSRF Token: {tokenData.CsrfToken.Substring(0, 10)}...");
+                            }
+
                             // 尝试获取用户信息
                             try
                             {
@@ -316,6 +323,7 @@ namespace biomed.Services
                                 if (userInfo != null)
                                 {
                                     userInfo.Token = tokenData.Token;
+                                    userInfo.CsrfToken = tokenData.CsrfToken;
                                     System.Diagnostics.Debug.WriteLine($"✅ 获取用户信息成功: {userInfo.Username}");
                                     return userInfo;
                                 }
@@ -329,6 +337,7 @@ namespace biomed.Services
                             var user = new User 
                             { 
                                 Token = tokenData.Token,
+                                CsrfToken = tokenData.CsrfToken,
                                 Username = loginRequest.Username
                             };
                             return user;
@@ -752,6 +761,124 @@ namespace biomed.Services
                         Pages = 0
                     };
                 }
+            }
+        }
+
+        // === 方剂管理相关API ===
+
+        /// <summary>
+        /// 确保方剂API有必要的认证信息
+        /// </summary>
+        private async Task EnsureFormulaApiTokenAsync()
+        {
+            // 检查是否有必要的认证信息
+            if (!_httpClient.DefaultRequestHeaders.Contains("Authorization"))
+            {
+                throw new Exception("请先登录后再使用方剂管理功能");
+            }
+
+            // CSRF token 已在登录时设置，这里只需要确认即可
+            await Task.CompletedTask;
+        }
+
+        /// <summary>
+        /// 分页查询方剂列表
+        /// </summary>
+        public async Task<FormulaPagedResult> GetFormulasAsync(int page = 1, int size = 12, string keyword = null, string source = null, int? categoryId = null)
+        {
+            try
+            {
+                // 确保方剂API有CSRF token
+                await EnsureFormulaApiTokenAsync();
+                
+                var queryParams = new List<string>();
+                queryParams.Add($"page={page}");
+                queryParams.Add($"size={size}");
+                
+                if (!string.IsNullOrWhiteSpace(keyword))
+                    queryParams.Add($"keyword={Uri.EscapeDataString(keyword)}");
+                
+                if (!string.IsNullOrWhiteSpace(source))
+                    queryParams.Add($"source={Uri.EscapeDataString(source)}");
+                
+                if (categoryId.HasValue)
+                    queryParams.Add($"categoryId={categoryId.Value}");
+
+                var endpoint = $"/api/formula/page?{string.Join("&", queryParams)}";
+                return await GetAsync<FormulaPagedResult>(endpoint);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"获取方剂列表失败: {ex.Message}", ex);
+            }
+        }
+
+        /// <summary>
+        /// 获取方剂详情
+        /// </summary>
+        public async Task<Formula> GetFormulaDetailAsync(long formulaId)
+        {
+            try
+            {
+                await EnsureFormulaApiTokenAsync();
+                var endpoint = $"/api/formula/{formulaId}";
+                return await GetAsync<Formula>(endpoint);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"获取方剂详情失败: {ex.Message}", ex);
+            }
+        }
+
+        /// <summary>
+        /// 基于症状推荐方剂
+        /// </summary>
+        public async Task<List<FormulaRecommendation>> GetFormulaRecommendationsAsync(List<string> symptoms)
+        {
+            try
+            {
+                await EnsureFormulaApiTokenAsync();
+                var request = new SymptomRequest { Symptoms = symptoms };
+                var endpoint = "/api/formula/recommend";
+                return await PostAsync<SymptomRequest, List<FormulaRecommendation>>(endpoint, request);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"获取方剂推荐失败: {ex.Message}", ex);
+            }
+        }
+
+        /// <summary>
+        /// 分析中药组合配伍规律
+        /// </summary>
+        public async Task<List<HerbCombination>> GetHerbCombinationsAsync(string herbName)
+        {
+            try
+            {
+                await EnsureFormulaApiTokenAsync();
+                var endpoint = $"/api/formula/analysis/herb-combinations?herbName={Uri.EscapeDataString(herbName)}";
+                return await GetAsync<List<HerbCombination>>(endpoint);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"获取中药配伍分析失败: {ex.Message}", ex);
+            }
+        }
+
+        /// <summary>
+        /// 比较多个方剂
+        /// </summary>
+        public async Task<FormulaComparison> CompareFormulasAsync(List<long> formulaIds)
+        {
+            try
+            {
+                await EnsureFormulaApiTokenAsync();
+                var endpoint = "/api/formula/compare";
+                return await PostAsync<List<long>, FormulaComparison>(endpoint, formulaIds);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"方剂比较失败: {ex.Message}", ex);
             }
         }
     }

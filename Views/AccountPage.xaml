@@ -8,38 +8,210 @@
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
     <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
-        <StackPanel Spacing="16" Padding="40,32,40,32">
-            <TextBlock Text="帐户 > 帐户信息" Style="{ThemeResource TitleTextBlockStyle}"/>
+        <StackPanel Spacing="24" Padding="40,32">
+            
+            <!-- 页面标题 -->
+            <TextBlock Text="个人主页" Style="{ThemeResource TitleLargeTextBlockStyle}" FontWeight="Bold"/>
 
-            <StackPanel Orientation="Horizontal" Spacing="16" Margin="0,24,0,0">
-                <PersonPicture ProfilePicture="{x:Bind ViewModel.UserStore.CurrentUser.ProfileImage, Mode=OneWay}" 
-                               DisplayName="{x:Bind ViewModel.UserStore.CurrentUser.Username, Mode=OneWay}" Height="80" Width="80"/>
-                <StackPanel VerticalAlignment="Center">
-                    <TextBlock Text="{x:Bind ViewModel.UserStore.CurrentUser.Username, Mode=OneWay}" Style="{ThemeResource SubtitleTextBlockStyle}" FontWeight="Bold"/>
-                    <TextBlock Text="{x:Bind ViewModel.UserStore.CurrentUser.FullName, Mode=OneWay, FallbackValue='暂无全名'}" Style="{ThemeResource BodyTextBlockStyle}"/>
+            <!-- 个人信息卡片 -->
+            <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                    BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                    BorderThickness="1"
+                    CornerRadius="8"
+                    Padding="24">
+                <StackPanel Spacing="20">
+                    <StackPanel Orientation="Horizontal" Spacing="16">
+                        <PersonPicture ProfilePicture="{x:Bind ViewModel.UserStore.CurrentUser.ProfileImage, Mode=OneWay}" 
+                                       DisplayName="{x:Bind ViewModel.UserStore.CurrentUser.Username, Mode=OneWay}" 
+                                       Height="80" Width="80"/>
+                        <StackPanel VerticalAlignment="Center" Spacing="4">
+                            <TextBlock Text="{x:Bind ViewModel.UserStore.CurrentUser.Username, Mode=OneWay}" 
+                                       Style="{ThemeResource SubtitleTextBlockStyle}" 
+                                       FontWeight="Bold"/>
+                            <TextBlock Text="{x:Bind ViewModel.UserStore.CurrentUser.FullName, Mode=OneWay, FallbackValue='暂无全名'}" 
+                                       Style="{ThemeResource BodyTextBlockStyle}"
+                                       Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                            <Border Background="{ThemeResource AccentFillColorDefaultBrush}"
+                                    CornerRadius="12"
+                                    Padding="8,4"
+                                    Margin="0,4,0,0">
+                                <TextBlock Text="✨ 高级用户" 
+                                           FontSize="12" 
+                                           Foreground="White"
+                                           FontWeight="SemiBold"/>
+                            </Border>
+                        </StackPanel>
+                    </StackPanel>
+                    
+                    <StackPanel Orientation="Horizontal" Spacing="12">
+                        <Button Click="ChangePasswordButton_Click"
+                                Style="{StaticResource AccentButtonStyle}">
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <FontIcon Glyph="🔐" FontSize="16"/>
+                                <TextBlock Text="修改密码"/>
+                            </StackPanel>
+                        </Button>
+                        
+                        <Button Click="EditProfileButton_Click">
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <FontIcon Glyph="✏️" FontSize="16"/>
+                                <TextBlock Text="编辑资料"/>
+                            </StackPanel>
+                        </Button>
+                    </StackPanel>
                 </StackPanel>
-            </StackPanel>
+            </Border>
 
-            <TextBlock Text="帐户设置" Style="{ThemeResource SubtitleTextBlockStyle}" Margin="0,24,0,0"/>
-            <InfoBar
-                IsOpen="True"
-                Severity="Warning"
-                Title="这是一个示例警告"
-                Message="您可以在此放置需要用户注意的信息。"
-                IsClosable="True"/>
+            <!-- 使用统计 -->
+            <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                    BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                    BorderThickness="1"
+                    CornerRadius="8"
+                    Padding="24">
+                <StackPanel Spacing="16">
+                    <TextBlock Text="📊 使用统计" 
+                               Style="{ThemeResource SubtitleTextBlockStyle}" 
+                               FontWeight="SemiBold"/>
+                    
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
 
-            <TextBlock Text="修改密码" Style="{ThemeResource SubtitleTextBlockStyle}" Margin="0,24,0,0"/>
-            <StackPanel Spacing="12" MaxWidth="320">
-                <PasswordBox x:Name="OldPasswordBox" Header="当前密码"/>
-                <PasswordBox x:Name="NewPasswordBox" Header="新密码"/>
-                <PasswordBox x:Name="ConfirmNewPasswordBox" Header="确认新密码"/>
-                <Button Content="确认修改" Command="{x:Bind ViewModel.UpdatePasswordCommand}" 
-                        CommandParameter="{Binding ElementName=OldPasswordBox, Path=Password}"
-                        Margin="0,8,0,0"/> 
-                <!-- A more robust solution would pass all passwords via a custom parameter object -->
-            </StackPanel>
+                        <StackPanel Grid.Column="0" Grid.Row="0" Spacing="4">
+                            <TextBlock Text="125" Style="{ThemeResource TitleTextBlockStyle}" FontWeight="Bold"/>
+                            <TextBlock Text="🔍 查询方剂" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                        </StackPanel>
 
-            <Button Content="注销" Command="{x:Bind ViewModel.LogoutCommand}" Margin="0,48,0,0"/>
+                        <StackPanel Grid.Column="1" Grid.Row="0" Spacing="4">
+                            <TextBlock Text="38" Style="{ThemeResource TitleTextBlockStyle}" FontWeight="Bold"/>
+                            <TextBlock Text="🧪 研究项目" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                        </StackPanel>
+
+                        <StackPanel Grid.Column="0" Grid.Row="1" Spacing="4" Margin="0,16,0,0">
+                            <TextBlock Text="67" Style="{ThemeResource TitleTextBlockStyle}" FontWeight="Bold"/>
+                            <TextBlock Text="📚 学习课程" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                        </StackPanel>
+
+                        <StackPanel Grid.Column="1" Grid.Row="1" Spacing="4" Margin="0,16,0,0">
+                            <TextBlock Text="15天" Style="{ThemeResource TitleTextBlockStyle}" FontWeight="Bold"/>
+                            <TextBlock Text="⚡ 活跃天数" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                        </StackPanel>
+                    </Grid>
+                </StackPanel>
+            </Border>
+
+            <!-- 快速操作 -->
+            <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                    BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                    BorderThickness="1"
+                    CornerRadius="8"
+                    Padding="24">
+                <StackPanel Spacing="16">
+                    <TextBlock Text="⚡ 快速操作" 
+                               Style="{ThemeResource SubtitleTextBlockStyle}" 
+                               FontWeight="SemiBold"/>
+                    
+                    <StackPanel Spacing="8">
+                        <Button HorizontalAlignment="Stretch" 
+                                Click="BackupDataButton_Click"
+                                HorizontalContentAlignment="Left">
+                            <StackPanel Orientation="Horizontal" Spacing="12">
+                                <TextBlock Text="💾" FontSize="20"/>
+                                <StackPanel>
+                                    <TextBlock Text="数据备份" FontWeight="SemiBold"/>
+                                    <TextBlock Text="备份您的个人数据" 
+                                               FontSize="12" 
+                                               Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </Button>
+
+                        <Button HorizontalAlignment="Stretch" 
+                                Click="NotificationSettingsButton_Click"
+                                HorizontalContentAlignment="Left">
+                            <StackPanel Orientation="Horizontal" Spacing="12">
+                                <TextBlock Text="🔔" FontSize="20"/>
+                                <StackPanel>
+                                    <TextBlock Text="通知设置" FontWeight="SemiBold"/>
+                                    <TextBlock Text="管理推送通知" 
+                                               FontSize="12" 
+                                               Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </Button>
+
+                        <Button HorizontalAlignment="Stretch" 
+                                Click="PrivacySettingsButton_Click"
+                                HorizontalContentAlignment="Left">
+                            <StackPanel Orientation="Horizontal" Spacing="12">
+                                <TextBlock Text="🔒" FontSize="20"/>
+                                <StackPanel>
+                                    <TextBlock Text="隐私设置" FontWeight="SemiBold"/>
+                                    <TextBlock Text="控制隐私选项" 
+                                               FontSize="12" 
+                                               Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </Button>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
+            <!-- 最近活动 -->
+            <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                    BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                    BorderThickness="1"
+                    CornerRadius="8"
+                    Padding="24">
+                <StackPanel Spacing="16">
+                    <TextBlock Text="🕒 最近活动" 
+                               Style="{ThemeResource SubtitleTextBlockStyle}" 
+                               FontWeight="SemiBold"/>
+                    
+                    <StackPanel Spacing="12">
+                        <StackPanel Spacing="4">
+                            <TextBlock Text="🔍 查询了龙胆泻肝汤" FontWeight="SemiBold"/>
+                            <TextBlock Text="2小时前" 
+                                       FontSize="12" 
+                                       Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                        </StackPanel>
+
+                        <StackPanel Spacing="4">
+                            <TextBlock Text="⚖️ 完成了方剂对比分析" FontWeight="SemiBold"/>
+                            <TextBlock Text="4小时前" 
+                                       FontSize="12" 
+                                       Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                        </StackPanel>
+
+                        <StackPanel Spacing="4">
+                            <TextBlock Text="📺 观看了中药配伍课程" FontWeight="SemiBold"/>
+                            <TextBlock Text="昨天" 
+                                       FontSize="12" 
+                                       Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                        </StackPanel>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
+            <!-- 退出登录 -->
+            <Button Command="{x:Bind ViewModel.LogoutCommand}"
+                    HorizontalAlignment="Stretch"
+                    Background="{ThemeResource SystemFillColorCriticalBrush}"
+                    Foreground="White"
+                    Margin="0,16,0,0">
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                    <TextBlock Text="🚪" FontSize="16"/>
+                    <TextBlock Text="退出登录"/>
+                </StackPanel>
+            </Button>
+
         </StackPanel>
     </ScrollViewer>
+
 </Page> 

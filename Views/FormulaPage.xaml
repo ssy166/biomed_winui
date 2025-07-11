@@ -1,16 +1,563 @@
+<?xml version="1.0" encoding="utf-8"?>
 <Page
     x:Class="biomed.Views.FormulaPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:models="using:biomed.Models"
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
     <Grid>
-        <TextBlock Text="方剂管理页面"
-                   HorizontalAlignment="Center"
-                   VerticalAlignment="Center"
-                   FontSize="32"/>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- 页面标题 -->
+        <Border Grid.Row="0" 
+                Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                BorderThickness="0,0,0,1"
+                Padding="32,24">
+            <StackPanel Orientation="Horizontal" Spacing="16">
+                <Border Background="{ThemeResource AccentFillColorDefaultBrush}"
+                        CornerRadius="8"
+                        Width="48"
+                        Height="48">
+                    <FontIcon Glyph="&#xE82D;" 
+                              FontSize="24" 
+                              Foreground="White"
+                              HorizontalAlignment="Center"
+                              VerticalAlignment="Center"/>
+                </Border>
+                <StackPanel VerticalAlignment="Center">
+                    <TextBlock Text="中医方剂智能分析系统"
+                               Style="{StaticResource TitleTextBlockStyle}"
+                               Foreground="{ThemeResource TextFillColorPrimaryBrush}"/>
+                    <TextBlock Text="传承千年智慧，探索方剂奥秘"
+                               Style="{StaticResource CaptionTextBlockStyle}"
+                               Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                               Margin="0,4,0,0"/>
+                </StackPanel>
+            </StackPanel>
+        </Border>
+
+        <!-- 主要内容区域 -->
+        <Pivot Grid.Row="1" Margin="24" x:Name="MainPivot">
+            
+            <!-- 方剂检索 -->
+            <PivotItem Header="方剂检索">
+
+                <ScrollViewer Padding="0,16">
+                    <StackPanel Spacing="24">
+                        <!-- 搜索控件 -->
+                        <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                                BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                                BorderThickness="1"
+                                CornerRadius="8"
+                                Padding="24">
+                            <StackPanel Spacing="16">
+                                <TextBlock Text="查找方剂" Style="{StaticResource SubheaderTextBlockStyle}"/>
+                                
+                                <StackPanel Orientation="Horizontal" Spacing="12">
+                                    <TextBox Text="{x:Bind ViewModel.SearchKeyword, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                             PlaceholderText="搜索方剂名称、主治..."
+                                             Width="300"
+                                             x:Name="SearchKeywordBox">
+                                        <TextBox.KeyboardAccelerators>
+                                            <KeyboardAccelerator Key="Enter" Invoked="SearchKeyword_EnterPressed"/>
+                                        </TextBox.KeyboardAccelerators>
+                                    </TextBox>
+                                    
+                                    <TextBox Text="{x:Bind ViewModel.SourceFilter, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                             PlaceholderText="按出处筛选，如：伤寒论"
+                                             Width="200"
+                                             x:Name="SourceFilterBox">
+                                        <TextBox.KeyboardAccelerators>
+                                            <KeyboardAccelerator Key="Enter" Invoked="SourceFilter_EnterPressed"/>
+                                        </TextBox.KeyboardAccelerators>
+                                    </TextBox>
+                                    
+                                    <Button Content="搜索"
+                                            Style="{StaticResource AccentButtonStyle}"
+                                            Command="{x:Bind ViewModel.SearchFormulasCommand}"/>
+                                    
+                                    <Button Content="重置"
+                                            Command="{x:Bind ViewModel.ResetSearchCommand}"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- 方剂列表 -->
+                        <StackPanel Spacing="16">
+                            <TextBlock Text="{x:Bind ViewModel.TotalItems, Mode=OneWay, FallbackValue='0'}"
+                                       Style="{StaticResource CaptionTextBlockStyle}">
+                                <Run Text="共找到 "/>
+                                <Run Text="{x:Bind ViewModel.TotalItems, Mode=OneWay}"/>
+                                <Run Text=" 个方剂"/>
+                            </TextBlock>
+
+                            <GridView ItemsSource="{x:Bind ViewModel.Formulas, Mode=OneWay}"
+                                      IsItemClickEnabled="True"
+                                      ItemClick="Formula_ItemClick"
+                                      SelectionMode="None">
+                                <GridView.ItemTemplate>
+                                    <DataTemplate x:DataType="models:Formula">
+                                        <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                                                BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                                                BorderThickness="1"
+                                                CornerRadius="8"
+                                                Width="320"
+                                                Height="200"
+                                                Padding="16">
+                                            <StackPanel Spacing="8">
+                                                <StackPanel Orientation="Horizontal">
+                                                    <TextBlock Text="{x:Bind Name}"
+                                                               Style="{StaticResource BaseTextBlockStyle}"
+                                                               FontWeight="SemiBold"/>
+                                                    <TextBlock Text="{x:Bind Alias, FallbackValue=''}"
+                                                               Style="{StaticResource CaptionTextBlockStyle}"
+                                                               Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                               Margin="8,0,0,0"
+                                                               Visibility="{x:Bind Alias, Converter={StaticResource StringToVisibilityConverter}}"/>
+                                                </StackPanel>
+                                                
+                                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                                    <FontIcon Glyph="&#xE8F4;" FontSize="12" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                                                    <TextBlock Text="{x:Bind Source}"
+                                                               Style="{StaticResource CaptionTextBlockStyle}"
+                                                               Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                                                    <TextBlock Text="{x:Bind Dynasty}"
+                                                               Style="{StaticResource CaptionTextBlockStyle}"
+                                                               Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                                                </StackPanel>
+
+                                                <TextBlock Text="功用" Style="{StaticResource CaptionTextBlockStyle}" FontWeight="SemiBold"/>
+                                                <TextBlock Text="{x:Bind FunctionEffect}"
+                                                           Style="{StaticResource CaptionTextBlockStyle}"
+                                                           TextWrapping="Wrap"
+                                                           MaxLines="2"/>
+
+                                                <TextBlock Text="主治" Style="{StaticResource CaptionTextBlockStyle}" FontWeight="SemiBold"/>
+                                                <TextBlock Text="{x:Bind MainTreatment}"
+                                                           Style="{StaticResource CaptionTextBlockStyle}"
+                                                           TextWrapping="Wrap"
+                                                           MaxLines="2"/>
+                                            </StackPanel>
+                                        </Border>
+                                    </DataTemplate>
+                                </GridView.ItemTemplate>
+                                <GridView.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <ItemsWrapGrid Orientation="Horizontal" HorizontalAlignment="Left"/>
+                                    </ItemsPanelTemplate>
+                                </GridView.ItemsPanel>
+                            </GridView>
+
+                            <!-- 分页控件 -->
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="16"
+                                        Visibility="{x:Bind ViewModel.TotalPages, Mode=OneWay, Converter={StaticResource ObjectToVisibilityConverter}}">
+                                <Button Content="上一页"
+                                        Command="{x:Bind ViewModel.PreviousPageCommand}"
+                                        IsEnabled="{x:Bind ViewModel.CurrentPage, Mode=OneWay, Converter={StaticResource GreaterThanConverter}, ConverterParameter=1}"/>
+                                
+                                <TextBlock VerticalAlignment="Center">
+                                    <Run Text="第 "/>
+                                    <Run Text="{x:Bind ViewModel.CurrentPage, Mode=OneWay}"/>
+                                    <Run Text=" 页，共 "/>
+                                    <Run Text="{x:Bind ViewModel.TotalPages, Mode=OneWay}"/>
+                                    <Run Text=" 页"/>
+                                </TextBlock>
+                                
+                                <Button Content="下一页"
+                                        Command="{x:Bind ViewModel.NextPageCommand}"/>
+                            </StackPanel>
+                        </StackPanel>
+
+                        <!-- 加载指示器 -->
+                        <ProgressRing IsActive="{x:Bind ViewModel.IsBusy, Mode=OneWay}"
+                                      HorizontalAlignment="Center"
+                                      Visibility="{x:Bind ViewModel.IsBusy, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                    </StackPanel>
+                </ScrollViewer>
+            </PivotItem>
+
+            <!-- 智能推荐 -->
+            <PivotItem Header="智能推荐">
+
+                <ScrollViewer Padding="0,16">
+                    <StackPanel Spacing="24">
+                        <!-- 症状输入 -->
+                        <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                                BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                                BorderThickness="1"
+                                CornerRadius="8"
+                                Padding="24">
+                            <StackPanel Spacing="16">
+                                <TextBlock Text="智能推荐" Style="{StaticResource SubheaderTextBlockStyle}"/>
+                                
+                                <StackPanel Orientation="Horizontal" Spacing="12">
+                                    <TextBox Text="{x:Bind ViewModel.NewSymptom, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                             PlaceholderText="输入症状，按回车确认"
+                                             Width="300"
+                                             x:Name="NewSymptomBox">
+                                        <TextBox.KeyboardAccelerators>
+                                            <KeyboardAccelerator Key="Enter" Invoked="NewSymptom_EnterPressed"/>
+                                        </TextBox.KeyboardAccelerators>
+                                    </TextBox>
+                                    <Button Content="添加症状" Command="{x:Bind ViewModel.AddSymptomCommand}"/>
+                                </StackPanel>
+
+                                <!-- 已添加的症状 -->
+                                <ItemsRepeater ItemsSource="{x:Bind ViewModel.Symptoms, Mode=OneWay}">
+                                    <ItemsRepeater.Layout>
+                                        <StackLayout Orientation="Horizontal" Spacing="8"/>
+                                    </ItemsRepeater.Layout>
+                                    <ItemsRepeater.ItemTemplate>
+                                        <DataTemplate x:DataType="x:String">
+                                            <Border Background="{ThemeResource AccentFillColorDefaultBrush}"
+                                                    CornerRadius="12"
+                                                    Padding="12,6">
+                                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                                    <TextBlock Text="{x:Bind}" Foreground="White" FontSize="12"/>
+                                                    <Button Background="Transparent"
+                                                            BorderThickness="0"
+                                                            Padding="4"
+                                                            Width="20"
+                                                            Height="20"
+                                                            Command="{Binding ElementName=MainPivot, Path=DataContext.RemoveSymptomCommand}"
+                                                            CommandParameter="{x:Bind}">
+                                                        <FontIcon Glyph="&#xE711;" FontSize="10" Foreground="White"/>
+                                                    </Button>
+                                                </StackPanel>
+                                            </Border>
+                                        </DataTemplate>
+                                    </ItemsRepeater.ItemTemplate>
+                                </ItemsRepeater>
+
+                                <!-- 常见症状快捷选择 -->
+                                <TextBlock Text="常见症状:" Style="{StaticResource CaptionTextBlockStyle}"/>
+                                <ItemsRepeater ItemsSource="{x:Bind ViewModel.CommonSymptoms}">
+                                    <ItemsRepeater.Layout>
+                                        <StackLayout Orientation="Horizontal" Spacing="8"/>
+                                    </ItemsRepeater.Layout>
+                                    <ItemsRepeater.ItemTemplate>
+                                        <DataTemplate x:DataType="x:String">
+                                            <Button Content="{x:Bind}"
+                                                    Background="{ThemeResource ButtonBackground}"
+                                                    BorderBrush="{ThemeResource ButtonBorderBrush}"
+                                                    FontSize="12"
+                                                    Padding="8,4"
+                                                    Command="{Binding ElementName=MainPivot, Path=DataContext.AddCommonSymptomCommand}"
+                                                    CommandParameter="{x:Bind}"/>
+                                        </DataTemplate>
+                                    </ItemsRepeater.ItemTemplate>
+                                </ItemsRepeater>
+
+                                <Button Content="获取方剂推荐"
+                                        Style="{StaticResource AccentButtonStyle}"
+                                        HorizontalAlignment="Left"
+                                        Command="{x:Bind ViewModel.GetRecommendationsCommand}"/>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- 推荐结果 -->
+                        <StackPanel Spacing="16" Visibility="{x:Bind ViewModel.Recommendations.Count, Mode=OneWay, Converter={StaticResource ObjectToVisibilityConverter}}">
+                            <TextBlock Text="推荐结果" Style="{StaticResource SubheaderTextBlockStyle}"/>
+                            
+                            <ItemsRepeater ItemsSource="{x:Bind ViewModel.Recommendations, Mode=OneWay}">
+                                <ItemsRepeater.Layout>
+                                    <StackLayout Spacing="12"/>
+                                </ItemsRepeater.Layout>
+                                <ItemsRepeater.ItemTemplate>
+                                    <DataTemplate x:DataType="models:FormulaRecommendation">
+                                        <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                                                BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                                                BorderThickness="1"
+                                                CornerRadius="8"
+                                                Padding="20">
+                                            <StackPanel Spacing="12">
+                                                <StackPanel Orientation="Horizontal" Spacing="16">
+                                                    <TextBlock Text="{x:Bind FormulaName}"
+                                                               Style="{StaticResource BaseTextBlockStyle}"
+                                                               FontWeight="SemiBold"/>
+                                                    <Border Background="{ThemeResource AccentFillColorDefaultBrush}"
+                                                            CornerRadius="12"
+                                                            Padding="8,4">
+                                                        <TextBlock Text="{x:Bind ScorePercentage}"
+                                                                   Foreground="White"
+                                                                   FontSize="12"/>
+                                                    </Border>
+                                                </StackPanel>
+
+                                                <ProgressBar Value="{x:Bind Score}"
+                                                             Maximum="1"
+                                                             Height="8"/>
+
+                                                <TextBlock Text="{x:Bind Recommendation}"
+                                                           Style="{StaticResource CaptionTextBlockStyle}"
+                                                           TextWrapping="Wrap"/>
+
+                                                <StackPanel Spacing="8" Visibility="{x:Bind Details, Mode=OneWay, Converter={StaticResource ObjectToVisibilityConverter}}">
+                                                    <TextBlock Text="组成:" FontWeight="SemiBold" Style="{StaticResource CaptionTextBlockStyle}"/>
+                                                    <TextBlock Text="{x:Bind Details.Composition, Mode=OneWay}"
+                                                               Style="{StaticResource CaptionTextBlockStyle}"
+                                                               TextWrapping="Wrap"/>
+                                                    
+                                                    <TextBlock Text="用法:" FontWeight="SemiBold" Style="{StaticResource CaptionTextBlockStyle}"/>
+                                                    <TextBlock Text="{x:Bind Details.Usage, Mode=OneWay}"
+                                                               Style="{StaticResource CaptionTextBlockStyle}"
+                                                               TextWrapping="Wrap"/>
+                                                </StackPanel>
+
+                                                <ProgressRing IsActive="{x:Bind IsLoadingDetails, Mode=OneWay}"
+                                                              Width="20"
+                                                              Height="20"
+                                                              Visibility="{x:Bind IsLoadingDetails, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                                            </StackPanel>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsRepeater.ItemTemplate>
+                            </ItemsRepeater>
+                        </StackPanel>
+
+                        <!-- 推荐加载指示器 -->
+                        <StackPanel Spacing="16" 
+                                    HorizontalAlignment="Center"
+                                    Visibility="{x:Bind ViewModel.IsRecommending, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
+                            <ProgressRing IsActive="{x:Bind ViewModel.IsRecommending, Mode=OneWay}" Width="50" Height="50"/>
+                            <TextBlock Text="AI辨证分析中..." HorizontalAlignment="Center"/>
+                        </StackPanel>
+                    </StackPanel>
+                </ScrollViewer>
+            </PivotItem>
+
+            <!-- 方剂对比 -->
+            <PivotItem Header="方剂对比">
+
+                <ScrollViewer Padding="0,16">
+                    <StackPanel Spacing="24">
+                        <!-- 选择方剂 -->
+                        <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                                BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                                BorderThickness="1"
+                                CornerRadius="8"
+                                Padding="24">
+                            <StackPanel Spacing="16">
+                                <TextBlock Text="方剂对比" Style="{StaticResource SubheaderTextBlockStyle}"/>
+                                
+                                <ComboBox ItemsSource="{x:Bind ViewModel.AllFormulasForCompare, Mode=OneWay}"
+                                          DisplayMemberPath="Name"
+                                          PlaceholderText="选择方剂进行对比"
+                                          Width="400"
+                                          SelectionChanged="FormulaComboBox_SelectionChanged"/>
+
+                                <!-- 已选择的方剂 -->
+                                <TextBlock Text="已选择的方剂:" Style="{StaticResource CaptionTextBlockStyle}"/>
+                                <ItemsRepeater ItemsSource="{x:Bind ViewModel.SelectedFormulasForCompare, Mode=OneWay}">
+                                    <ItemsRepeater.Layout>
+                                        <StackLayout Spacing="8"/>
+                                    </ItemsRepeater.Layout>
+                                    <ItemsRepeater.ItemTemplate>
+                                        <DataTemplate x:DataType="models:Formula">
+                                            <Border Background="{ThemeResource AccentFillColorDefaultBrush}"
+                                                    CornerRadius="4"
+                                                    Padding="12,8">
+                                                <StackPanel Orientation="Horizontal" Spacing="12">
+                                                    <TextBlock Text="{x:Bind Name}" Foreground="White"/>
+                                                    <Button Background="Transparent"
+                                                            BorderThickness="0"
+                                                            Padding="4"
+                                                            Command="{Binding ElementName=MainPivot, Path=DataContext.RemoveFormulaFromCompareCommand}"
+                                                            CommandParameter="{x:Bind}">
+                                                        <FontIcon Glyph="&#xE711;" FontSize="12" Foreground="White"/>
+                                                    </Button>
+                                                </StackPanel>
+                                            </Border>
+                                        </DataTemplate>
+                                    </ItemsRepeater.ItemTemplate>
+                                </ItemsRepeater>
+
+                                <Button Content="开始对比分析"
+                                        Style="{StaticResource AccentButtonStyle}"
+                                        HorizontalAlignment="Left"
+                                        Command="{x:Bind ViewModel.CompareFormulasCommand}"/>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- 对比结果 -->
+                        <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                                BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                                BorderThickness="1"
+                                CornerRadius="8"
+                                Padding="24"
+                                Visibility="{x:Bind ViewModel.ComparisonResult, Mode=OneWay, Converter={StaticResource ObjectToVisibilityConverter}}">
+                            <StackPanel Spacing="16">
+                                <TextBlock Text="对比结果" Style="{StaticResource SubheaderTextBlockStyle}"/>
+                                
+                                <!-- 对比表格使用DataGrid或手动布局 -->
+                                <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
+                                    <Grid x:Name="ComparisonGrid">
+                                        <!-- 这里会在代码后台动态生成对比表格 -->
+                                    </Grid>
+                                </ScrollViewer>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- 对比加载指示器 -->
+                        <StackPanel Spacing="16" 
+                                    HorizontalAlignment="Center"
+                                    Visibility="{x:Bind ViewModel.IsComparing, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
+                            <ProgressRing IsActive="{x:Bind ViewModel.IsComparing, Mode=OneWay}" Width="50" Height="50"/>
+                            <TextBlock Text="对比分析中..." HorizontalAlignment="Center"/>
+                        </StackPanel>
+                    </StackPanel>
+                </ScrollViewer>
+            </PivotItem>
+
+            <!-- 配伍分析 -->
+            <PivotItem Header="配伍分析">
+
+                <ScrollViewer Padding="0,16">
+                    <StackPanel Spacing="24">
+                        <!-- 中药输入 -->
+                        <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                                BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                                BorderThickness="1"
+                                CornerRadius="8"
+                                Padding="24">
+                            <StackPanel Spacing="16">
+                                <TextBlock Text="配伍分析" Style="{StaticResource SubheaderTextBlockStyle}"/>
+                                
+                                <StackPanel Orientation="Horizontal" Spacing="12">
+                                    <TextBox Text="{x:Bind ViewModel.HerbName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                             PlaceholderText="输入核心药材进行配伍分析"
+                                             Width="300"
+                                             x:Name="HerbNameBox">
+                                        <TextBox.KeyboardAccelerators>
+                                            <KeyboardAccelerator Key="Enter" Invoked="HerbName_EnterPressed"/>
+                                        </TextBox.KeyboardAccelerators>
+                                    </TextBox>
+                                    <Button Content="开始配伍分析"
+                                            Style="{StaticResource AccentButtonStyle}"
+                                            Command="{x:Bind ViewModel.AnalyzeHerbCombinationsCommand}"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- 分析结果 -->
+                        <Grid ColumnSpacing="24" Visibility="{x:Bind ViewModel.HerbCombinations.Count, Mode=OneWay, Converter={StaticResource ObjectToVisibilityConverter}}">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <!-- 数据表格 -->
+                            <Border Grid.Column="0"
+                                    Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                                    BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                                    BorderThickness="1"
+                                    CornerRadius="8"
+                                    Padding="24">
+                                <StackPanel Spacing="16">
+                                    <TextBlock Text="配伍数据详情" Style="{StaticResource SubheaderTextBlockStyle}"/>
+                                    
+                                    <ListView ItemsSource="{x:Bind ViewModel.HerbCombinations, Mode=OneWay}"
+                                              SelectionMode="None"
+                                              MaxHeight="400">
+                                        <ListView.HeaderTemplate>
+                                            <DataTemplate>
+                                                <Grid Background="{ThemeResource AccentFillColorDefaultBrush}"
+                                                      Padding="12,8"
+                                                      CornerRadius="4,4,0,0">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*"/>
+                                                        <ColumnDefinition Width="80"/>
+                                                        <ColumnDefinition Width="80"/>
+                                                    </Grid.ColumnDefinitions>
+                                                    <TextBlock Grid.Column="0" Text="配伍药材" Foreground="White" FontWeight="SemiBold"/>
+                                                    <TextBlock Grid.Column="1" Text="配伍次数" Foreground="White" FontWeight="SemiBold"/>
+                                                    <TextBlock Grid.Column="2" Text="配伍比例" Foreground="White" FontWeight="SemiBold"/>
+                                                </Grid>
+                                            </DataTemplate>
+                                        </ListView.HeaderTemplate>
+                                        <ListView.ItemTemplate>
+                                            <DataTemplate x:DataType="models:HerbCombination">
+                                                <Grid Padding="12,8">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*"/>
+                                                        <ColumnDefinition Width="80"/>
+                                                        <ColumnDefinition Width="80"/>
+                                                    </Grid.ColumnDefinitions>
+                                                    <TextBlock Grid.Column="0" Text="{x:Bind HerbName}"/>
+                                                    <TextBlock Grid.Column="1" Text="{x:Bind CombinationCount}" HorizontalAlignment="Center"/>
+                                                    <TextBlock Grid.Column="2" Text="{x:Bind CombinationRatioPercentage}" HorizontalAlignment="Center"/>
+                                                </Grid>
+                                            </DataTemplate>
+                                        </ListView.ItemTemplate>
+                                    </ListView>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- 图表区域（简化版） -->
+                            <Border Grid.Column="1"
+                                    Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                                    BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                                    BorderThickness="1"
+                                    CornerRadius="8"
+                                    Padding="24">
+                                <StackPanel Spacing="16">
+                                    <TextBlock Text="配伍频次图表" Style="{StaticResource SubheaderTextBlockStyle}"/>
+                                    
+                                    <!-- 简化的图表显示 -->
+                                    <ItemsRepeater ItemsSource="{x:Bind ViewModel.HerbCombinations, Mode=OneWay}" MaxWidth="300">
+                                        <ItemsRepeater.Layout>
+                                            <StackLayout Spacing="8"/>
+                                        </ItemsRepeater.Layout>
+                                        <ItemsRepeater.ItemTemplate>
+                                            <DataTemplate x:DataType="models:HerbCombination">
+                                                <StackPanel Spacing="4">
+                                                    <Grid>
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="*"/>
+                                                            <ColumnDefinition Width="Auto"/>
+                                                        </Grid.ColumnDefinitions>
+                                                        <TextBlock Grid.Column="0" Text="{x:Bind HerbName}" Style="{StaticResource CaptionTextBlockStyle}"/>
+                                                        <TextBlock Grid.Column="1" Text="{x:Bind CombinationCount}" Style="{StaticResource CaptionTextBlockStyle}"/>
+                                                    </Grid>
+                                                    <ProgressBar Value="{x:Bind CombinationRatio}"
+                                                                 Maximum="1"
+                                                                 Height="6"
+                                                                 Background="{ThemeResource ControlStrokeColorDefaultBrush}"
+                                                                 Foreground="{ThemeResource AccentFillColorDefaultBrush}"/>
+                                                </StackPanel>
+                                            </DataTemplate>
+                                        </ItemsRepeater.ItemTemplate>
+                                    </ItemsRepeater>
+                                </StackPanel>
+                            </Border>
+                        </Grid>
+
+                        <!-- 分析加载指示器 -->
+                        <StackPanel Spacing="16" 
+                                    HorizontalAlignment="Center"
+                                    Visibility="{x:Bind ViewModel.IsAnalyzing, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
+                            <ProgressRing IsActive="{x:Bind ViewModel.IsAnalyzing, Mode=OneWay}" Width="50" Height="50"/>
+                            <TextBlock Text="配伍分析中..." HorizontalAlignment="Center"/>
+                        </StackPanel>
+                    </StackPanel>
+                </ScrollViewer>
+            </PivotItem>
+        </Pivot>
+
+        <!-- 错误信息 -->
+        <InfoBar Grid.Row="2"
+                 Severity="Error"
+                 IsOpen="{x:Bind ViewModel.IsError, Mode=OneWay}"
+                 Message="{x:Bind ViewModel.ErrorMessage, Mode=OneWay}"
+                 Margin="24,0,24,24"/>
     </Grid>
 </Page> 
